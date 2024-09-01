@@ -18,6 +18,21 @@ public class PolicyDao implements IPolicyDao {
 		this.connection = connection;
 	}
 	
+	private void checkPolicyExist(int policyId) {
+		try {
+			String checkSql = "SELECT * FROM Policy WHERE policy_id = ?";
+			PreparedStatement checkStatement = connection.prepareStatement(checkSql);
+	        checkStatement.setInt(1, policyId);
+	        ResultSet resultSet = checkStatement.executeQuery();
+	        if (!resultSet.next()) {
+	        	System.out.println("Policy with ID " + policyId + " does not exist.");
+	        	return;
+	        }
+		} catch (Exception e) {
+			System.out.println("Some unexpected error occured");
+		}
+	}
+	
 	@Override
 	public void addPolicy(Policy policy) {
 		try {
@@ -71,14 +86,7 @@ public class PolicyDao implements IPolicyDao {
 		try {
 			
 			// check if policy exists
-			String checkSql = "SELECT * FROM Policy WHERE policy_id = ?";
-			PreparedStatement checkStatement = connection.prepareStatement(checkSql);
-	        checkStatement.setInt(1, policyId);
-	        ResultSet resultSet = checkStatement.executeQuery();
-	        if (!resultSet.next()) {
-	        	System.out.println("Policy with ID " + policyId + " does not exist.");
-	        	return;
-	        }
+			this.checkPolicyExist(policyId);
 	        
 	        // update policy
 			String sql = "UPDATE Policy SET policy_number = ?, type = ?, coverage_amount = ?, premium_amount = ? WHERE policy_id = ?";
@@ -105,7 +113,15 @@ public class PolicyDao implements IPolicyDao {
 
 	@Override
 	public void deletePolicy(int policyId) {
-
+		try {
+			
+			// check if policy exists
+			this.checkPolicyExist(policyId);
+			
+			// check if there are claims associated with the policy
+		} catch (Exception e) {
+			System.out.println("Some error occured while deleting policy");
+		}
 	}
 
 }

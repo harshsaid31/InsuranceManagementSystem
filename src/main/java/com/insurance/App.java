@@ -40,14 +40,18 @@ public class App {
 					choiceManager.managePolicies(scanner, policyDao);
 					break;
 				}
+				case 2: {
+					choiceManager.manageCustomers(scanner, customerDao);
+					break;
+				}
 				case 4: {
 					break;
 				}
 				default:
 					System.out.println("Invalid Choice");
 				}
-	            
 	    	}
+	    	
     	} catch (Exception e) {
     		System.out.println("Some error occured please try again");
     		e.printStackTrace();
