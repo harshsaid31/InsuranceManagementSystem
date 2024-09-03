@@ -9,7 +9,7 @@ Features:
 	
 Pre-requisite for running Application:
 1. Java Development Kit (JDK) 8 or above
-2. MySql Server
+2. MySQL Server
 3. Eclipse IDE
 	
 Project setup steps:
