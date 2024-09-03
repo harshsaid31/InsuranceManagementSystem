@@ -4,12 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import javax.swing.tree.DefaultTreeCellEditor.EditorContainer;
-
 import com.insurance.interfaces.IPolicyDao;
 import com.insurance.models.Policy;
-import com.mysql.cj.protocol.Resultset;
-
+import com.insurance.utils.GeneralUtilities;
 public class PolicyDao implements IPolicyDao {
 
 	private Connection connection = null;
@@ -18,25 +15,9 @@ public class PolicyDao implements IPolicyDao {
 		this.connection = connection;
 	}
 	
-	private void checkPolicyExist(int policyId) {
-		try {
-			String checkSql = "SELECT * FROM Policy WHERE policy_id = ?";
-			PreparedStatement checkStatement = connection.prepareStatement(checkSql);
-	        checkStatement.setInt(1, policyId);
-	        ResultSet resultSet = checkStatement.executeQuery();
-	        if (!resultSet.next()) {
-	        	System.out.println("Policy with ID " + policyId + " does not exist.");
-	        	return;
-	        }
-		} catch (Exception e) {
-			System.out.println("Some unexpected error occured");
-		}
-	}
-	
 	@Override
 	public void addPolicy(Policy policy) {
 		try {
-            
 			String sql = "INSERT INTO Policy (policy_number, type, coverage_amount, premium_amount) VALUES (?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             
@@ -52,14 +33,12 @@ public class PolicyDao implements IPolicyDao {
 		
 		} catch (Exception e) {
 			System.out.println("Some error occured while adding policy");
-			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void viewPolicy(int policyId) {
 		try {
-			
 			String sql = "SELECT * FROM Policy WHERE policy_id = ?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setInt(1, policyId);
@@ -84,9 +63,10 @@ public class PolicyDao implements IPolicyDao {
 	@Override
 	public void updatePolicy(int policyId, Policy policy) {
 		try {
-			
 			// check if policy exists
-			this.checkPolicyExist(policyId);
+			if (GeneralUtilities.checkPolicyExist(policyId)) {
+				return;
+			}
 	        
 	        // update policy
 			String sql = "UPDATE Policy SET policy_number = ?, type = ?, coverage_amount = ?, premium_amount = ? WHERE policy_id = ?";
@@ -112,16 +92,59 @@ public class PolicyDao implements IPolicyDao {
 	}
 
 	@Override
-	public void deletePolicy(int policyId) {
+	public void viewAllPolicies() {
 		try {
 			
-			// check if policy exists
-			this.checkPolicyExist(policyId);
-			
-			// check if there are claims associated with the policy
+			// header
+			System.out.println("-----------------------------------------------------------------------");
+			System.out.printf("%-15s %-15s %-15s %-15s %-15s\n", "Policy ID", "Policy Number", "Type", "Coverage", "Premium");
+			System.out.println("-----------------------------------------------------------------------");
+				
+			String sql = "SELECT * FROM Policy";
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				int policyId = resultSet.getInt("policy_id");
+				String policyNumber = resultSet.getString("policy_number");
+				String type = resultSet.getString("type");
+				double coverageAmount = resultSet.getDouble("coverage_amount");
+				double premiumAmount = resultSet.getDouble("premium_amount");
+
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s\n", policyId, policyNumber, type, coverageAmount, premiumAmount);
+			}
+
 		} catch (Exception e) {
-			System.out.println("Some error occured while deleting policy");
+			System.out.println("Some error occred while viewing all policies");
+			e.printStackTrace();
 		}
 	}
 
+	@Override
+	public void deletePolicy(int policyId) {
+		try {
+			// check if policy exists
+			if (GeneralUtilities.checkPolicyExist(policyId)) {
+				return;
+			}
+			
+			// check if there are claims associated with the policy
+			if (GeneralUtilities.checkClaimAssociatedWithPolicy(policyId)) {
+				return;
+			}
+
+			// delete policy
+			String sql = "DELETE FROM Policy WHERE policy_id = ?";
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setInt(1, policyId);
+			int rowsDeleted = preparedStatement.executeUpdate();
+            if (rowsDeleted > 0) {
+                System.out.println("Policy deleted successfully");
+            }
+			
+		} catch (Exception e) {
+			System.out.println("Some error occured while deleting policy");
+			e.printStackTrace();
+		}
+	}
 }

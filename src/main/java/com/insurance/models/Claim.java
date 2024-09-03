@@ -8,6 +8,8 @@ public class Claim {
 	private String claimDate;
 	private String status;
 	
+	public Claim() {}
+
 	public Claim(int claimId, int policyId, int customerId, String claimDate, String status) {
 		this.claimId = claimId;
 		this.policyId = policyId;

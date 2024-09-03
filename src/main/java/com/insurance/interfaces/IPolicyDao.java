@@ -7,4 +7,5 @@ public interface IPolicyDao {
 	public void viewPolicy(int policyId);
 	public void updatePolicy(int policyId, Policy policy);
 	public void deletePolicy(int policyId);
+	public void viewAllPolicies();
 }

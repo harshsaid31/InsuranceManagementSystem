@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 
 import com.insurance.interfaces.ICustomerDao;
 import com.insurance.models.Customer;
+import com.insurance.utils.GeneralUtilities;
 
 public class CustomerDao implements ICustomerDao {
 	
@@ -56,7 +57,6 @@ public class CustomerDao implements ICustomerDao {
 	@Override
 	public void viewCustomer(int customerId) {
 		try {
-
 			String sql = "SELECT * FROM Customer WHERE customer_id = ?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setInt(1, customerId);
@@ -109,8 +109,26 @@ public class CustomerDao implements ICustomerDao {
 
 	@Override
 	public void deleteCustomer(int customerId) {
-		// TODO Auto-generated method stub
-		
-	}
-	
+		try {
+			// check if customer exist's
+			if (GeneralUtilities.checkCustomerExist(customerId)) {
+				return;
+			}
+
+			// check if any claim is associated with the customer
+			if (GeneralUtilities.checkClaimAssociatedWithCustomer(customerId)) {
+				return;
+			}
+
+			String sql = "DELETE FROM Customer WHERE customer_id = ?";
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setInt(1, customerId);
+			int rowsDeleted = preparedStatement.executeUpdate();
+            if (rowsDeleted > 0) {
+                System.out.println("Customer deleted successfully!");
+            }
+		} catch (Exception e) {
+			System.out.println("Some error occured while deleting customer");
+		}
+	}	
 }
