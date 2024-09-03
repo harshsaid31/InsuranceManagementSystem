@@ -3,14 +3,14 @@ Project: Insurance Management System
 The following repository contains the code of Insurance Management System (console based application). This project is developed using Core Java and MySQL.
 
 Features:
-	* Policy Management
-	* Customer Management
-	* Claim Management
+	- Policy Management
+	- Customer Management
+	- Claim Management
 	
 Pre-requisite for running Application:
-	* Java Development Kit (JDK) 8 or above
-	* MySql Server
-	* Eclipse IDE
+	- Java Development Kit (JDK) 8 or above
+	- MySql Server
+	- Eclipse IDE
 	
 Project setup steps:
 
