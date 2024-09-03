@@ -221,7 +221,7 @@ public class ChoiceManager {
 				int claimId = scanner.nextInt();
 
 				// take input for the status of claim
-				System.out.println("\n Select Status Type: ");
+				System.out.println("\nSelect Status Type: ");
 				System.out.println("1. Submitted");
 				System.out.println("2. Processed");
 				System.out.println("3. Cancel");

@@ -20,14 +20,10 @@ public class ClaimDao implements IClaimDao {
 	public void submitClaim(Claim claim) {
 		try {
 			// check if policy exist's
-			if (GeneralUtilities.checkPolicyExist(claim.getPolicyId())) {
-				return;
-			}
+			GeneralUtilities.checkPolicyExist(connection, claim.getPolicyId());
 
 			// check if customer exist's
-			if (GeneralUtilities.checkCustomerExist(claim.getCustomerId())) {
-				return;
-			}
+			GeneralUtilities.checkCustomerExist(connection, claim.getCustomerId());
 
 			// submit claim
 			String sql = "INSERT INTO Claim (policy_id, customer_id, claim_date, status) VALUES (?, ?, ?, ?)";
@@ -43,30 +39,39 @@ public class ClaimDao implements IClaimDao {
 			} 
 
 		} catch (Exception e) {
-			System.out.println("Some error occured while submitting claim");
+			System.out.println(e.getMessage());
 		}
 	}
 
 	@Override
 	public void viewClaim(int claimId) {
 		try {
-			String sql = "SELECT * FROM Claim WHERE claim_id = ?";
+			String sql = "SELECT cl.claim_id, p.type, cu.name, cl.claim_date, cl.status FROM claim cl INNER JOIN policy p on cl.policy_id = p.policy_id INNER JOIN customer cu ON cl.customer_id = cu.customer_id where cl.claim_id = ?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
 			preparedStatement.setInt(1, claimId);
 
             ResultSet result = preparedStatement.executeQuery();
+            
             if (result.next()) {
-                System.out.println("Claim ID: " + result.getInt("claim_id"));
-                System.out.println("Policy ID: " + result.getInt("policy_id"));
-                System.out.println("Customer ID: " + result.getInt("customer_id"));
-                System.out.println("Claim Date: " + result.getString("claim_date"));
-                System.out.println("Status: " + result.getString("status"));
+            	System.out.println();
+    			System.out.println("----------------------------------------------------------------------------");
+    			System.out.printf("%-15s %-15s %-20s %-15s %-15s\n", "Claim ID", "Policy Type", "Customer Name", "Claim Date", "Status");
+    			System.out.println("----------------------------------------------------------------------------");
+                
+            	
+                int claim_id = result.getInt("claim_id");
+                String policyType = result.getString("type");
+                String name = result.getString("name");
+                String claimDate = result.getString("claim_date");
+                String status = result.getString("status");
+                
+				System.out.printf("%-15s %-15s %-20s %-15s %-15s\n", claim_id, policyType , name, claimDate, status);
             } else {
                 System.out.println("Claim not found.");
             }
 		} catch (Exception e) {
-			System.out.println("Some error occured while viewing claim");
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -75,9 +80,7 @@ public class ClaimDao implements IClaimDao {
 		try {
 
 			// check if claim exist
-			if (GeneralUtilities.checkClaimExist(claimId)) {
-				return;
-			}
+			GeneralUtilities.checkClaimExist(connection, claimId);
 
 			// update claim
 			String sql = "UPDATE Claim SET status = ? WHERE claim_id = ?";
@@ -90,7 +93,7 @@ public class ClaimDao implements IClaimDao {
 				System.out.println("Claim Updated Successfully");
 			}
 		} catch (Exception e) {
-			System.out.println("Some error occured while updating claim");
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -98,10 +101,8 @@ public class ClaimDao implements IClaimDao {
 	public void deleteClaim(int claimId) {
 		try {
 			// check if claim exist
-			if (GeneralUtilities.checkClaimExist(claimId)) {
-				return;
-			}
-
+			GeneralUtilities.checkClaimExist(connection, claimId);
+			
 			// delete claim
 			String sql = "DELETE FROM Claim WHERE claim_id = ?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -112,7 +113,7 @@ public class ClaimDao implements IClaimDao {
 				System.out.println("Claim Deleted Successfully");
 			}
 		} catch (Exception e) {
-			System.out.println("Some error occured while deleting claim");
+			System.out.println(e.getMessage());
 		}
 	}
 }

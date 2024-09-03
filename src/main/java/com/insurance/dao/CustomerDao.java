@@ -15,21 +15,6 @@ public class CustomerDao implements ICustomerDao {
 	public CustomerDao(Connection connection) {
 		this.connection = connection;
 	}
-	
-	private void checkCustomerExist(int customerId) {
-		try {
-		String sql = "SELECT * FROM Customer WHERE customer_id = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, customerId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (!resultSet.next()) {
-                System.out.println("Customer with ID " + customerId + " does not exist.");
-                return;
-            }
-        } catch (Exception e) {
-        	System.out.println("Some error occured");
-        }
-	}
 
 	@Override
 	public void registerCustomer(Customer customer) {
@@ -49,8 +34,7 @@ public class CustomerDao implements ICustomerDao {
 			}
 			
 		} catch (Exception e) {
-			System.out.println("Some error occured while regestring customer");
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -62,12 +46,20 @@ public class CustomerDao implements ICustomerDao {
 			preparedStatement.setInt(1, customerId);
 			
 			ResultSet result = preparedStatement.executeQuery();
+			
             if (result.next()) {
-            	System.out.println("Customer ID: " + result.getInt("customer_id"));
-                System.out.println("Name: " + result.getString("name"));
-                System.out.println("Email: " + result.getString("email"));
-                System.out.println("Phone Number: " + result.getString("phone_number"));
-                System.out.println("Address: " + result.getString("address"));
+            	System.out.println();
+    			System.out.println("----------------------------------------------------------------------------------");
+    			System.out.printf("%-15s %-15s %-25s %-15s %-15s\n", "Customer ID", "Name", "Email", "Phone Number", "Address");
+    			System.out.println("----------------------------------------------------------------------------------");
+    			
+            	int customer_id = result.getInt("customer_id");
+                String name = result.getString("name");
+                String email = result.getString("email");
+                String phoneNumber = result.getString("phone_number");
+                String address = result.getString("address");
+                
+				System.out.printf("%-15s %-15s %-25s %-15s %-15s\n", customer_id, name, email, phoneNumber, address);
             } else {
                 System.out.println("Customer not found.");
             }
@@ -83,7 +75,7 @@ public class CustomerDao implements ICustomerDao {
 		try {
 			
 			// check if customer exist
-			this.checkCustomerExist(customerId);
+			GeneralUtilities.checkCustomerExist(connection, customerId);
 			
 			// update customer 
 			String sql = "UPDATE Customer SET name = ?, email = ?, phone_number = ?, address = ? WHERE customer_id = ?";
@@ -103,7 +95,7 @@ public class CustomerDao implements ICustomerDao {
 			}
 			
 		} catch (Exception e) {
-			System.out.println("Some error occured while updating customer");
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -111,14 +103,10 @@ public class CustomerDao implements ICustomerDao {
 	public void deleteCustomer(int customerId) {
 		try {
 			// check if customer exist's
-			if (GeneralUtilities.checkCustomerExist(customerId)) {
-				return;
-			}
+			GeneralUtilities.checkCustomerExist(connection, customerId);
 
 			// check if any claim is associated with the customer
-			if (GeneralUtilities.checkClaimAssociatedWithCustomer(customerId)) {
-				return;
-			}
+			GeneralUtilities.checkClaimAssociatedWithCustomer(connection, customerId);
 
 			String sql = "DELETE FROM Customer WHERE customer_id = ?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -128,7 +116,7 @@ public class CustomerDao implements ICustomerDao {
                 System.out.println("Customer deleted successfully!");
             }
 		} catch (Exception e) {
-			System.out.println("Some error occured while deleting customer");
+			System.out.println(e.getMessage());
 		}
 	}	
 }

@@ -32,7 +32,7 @@ public class PolicyDao implements IPolicyDao {
             }
 		
 		} catch (Exception e) {
-			System.out.println("Some error occured while adding policy");
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -43,13 +43,21 @@ public class PolicyDao implements IPolicyDao {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setInt(1, policyId);
 			
-			ResultSet result = preparedStatement.executeQuery();
-			if (result.next()) {
-                System.out.println("Policy ID: " + result.getInt("policy_id"));
-                System.out.println("Policy Number: " + result.getString("policy_number"));
-                System.out.println("Type: " + result.getString("type"));
-                System.out.println("Coverage Amount: " + result.getDouble("coverage_amount"));
-                System.out.println("Premium Amount: " + result.getDouble("premium_amount"));
+			ResultSet resultSet = preparedStatement.executeQuery();
+			
+			if (resultSet.next()) {
+				System.out.println();
+				System.out.println("-----------------------------------------------------------------------");
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s\n", "Policy ID", "Policy Number", "Type", "Coverage", "Premium");
+				System.out.println("-----------------------------------------------------------------------");
+				
+				int policy_id = resultSet.getInt("policy_id");
+				String policyNumber = resultSet.getString("policy_number");
+				String type = resultSet.getString("type");
+				double coverageAmount = resultSet.getDouble("coverage_amount");
+				double premiumAmount = resultSet.getDouble("premium_amount");
+				
+				System.out.printf("%-15s %-15s %-15s %-15s %-15s\n", policy_id, policyNumber, type, coverageAmount, premiumAmount);
             } else {
                 System.out.println("Policy not found.");
             }
@@ -64,9 +72,7 @@ public class PolicyDao implements IPolicyDao {
 	public void updatePolicy(int policyId, Policy policy) {
 		try {
 			// check if policy exists
-			if (GeneralUtilities.checkPolicyExist(policyId)) {
-				return;
-			}
+			GeneralUtilities.checkPolicyExist(connection, policyId);
 	        
 	        // update policy
 			String sql = "UPDATE Policy SET policy_number = ?, type = ?, coverage_amount = ?, premium_amount = ? WHERE policy_id = ?";
@@ -86,8 +92,7 @@ public class PolicyDao implements IPolicyDao {
 			}
 			
 		} catch (Exception e) {
-			System.out.println("Some error occured while updating policy");
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -115,8 +120,7 @@ public class PolicyDao implements IPolicyDao {
 			}
 
 		} catch (Exception e) {
-			System.out.println("Some error occred while viewing all policies");
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -124,14 +128,10 @@ public class PolicyDao implements IPolicyDao {
 	public void deletePolicy(int policyId) {
 		try {
 			// check if policy exists
-			if (GeneralUtilities.checkPolicyExist(policyId)) {
-				return;
-			}
-			
+			GeneralUtilities.checkPolicyExist(connection, policyId);
+
 			// check if there are claims associated with the policy
-			if (GeneralUtilities.checkClaimAssociatedWithPolicy(policyId)) {
-				return;
-			}
+			GeneralUtilities.checkClaimAssociatedWithPolicy(connection, policyId);
 
 			// delete policy
 			String sql = "DELETE FROM Policy WHERE policy_id = ?";
@@ -143,8 +143,7 @@ public class PolicyDao implements IPolicyDao {
             }
 			
 		} catch (Exception e) {
-			System.out.println("Some error occured while deleting policy");
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 }
