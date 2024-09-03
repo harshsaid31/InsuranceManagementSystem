@@ -1,18 +1,18 @@
-#Project: Insurance Management System
+Project: Insurance Management System
 
 The following repository contains the code of Insurance Management System (console based application). This project is developed using Core Java and MySQL.
 
-#Features:
+Features:
 	* Policy Management
 	* Customer Management
 	* Claim Management
 	
-#Pre-requisite for running Application:
+Pre-requisite for running Application:
 	* Java Development Kit (JDK) 8 or above
 	* MySql Server
 	* Eclipse IDE
 	
-#Project setup steps:
+Project setup steps:
 
 1. Clone the repository
 
@@ -71,7 +71,7 @@ FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
 );
 ```
 
-4. After following the above steps run the application by navigating to `App.java` file. Right-click on the file and click on run the java application. The console application with start running.
+5. After following the above steps run the application by navigating to `App.java` file. Right-click on the file and click on run the java application. The console application with start running.
 
 
 
