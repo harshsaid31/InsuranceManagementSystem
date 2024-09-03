@@ -25,49 +25,49 @@ The following repository contains the code of Insurance Management System (conso
 Create MySQL Database using following command
 
 ```shell
-	CREATE DATABASE insurance;
+CREATE DATABASE insurance;
 ```
 
 Update the database credentials in the `DatabaseConnection.java` or a configuration file:
 
 ```shell
-	private static final String URL = "jdbc:mysql://localhost:3306/insurance";
-	private static final String USER = "your_username";
-	private static final String PASSWORD = "your_password";
+private static final String URL = "jdbc:mysql://localhost:3306/insurance";
+private static final String USER = "your_username";
+private static final String PASSWORD = "your_password";
 ```
 
 
 4. Create the tables by executing the following MySQL commands
 
 ```shell
-	CREATE TABLE Policy (
-    policy_id INT AUTO_INCREMENT PRIMARY KEY,
-    policy_number VARCHAR(255) UNIQUE NOT NULL,
-    type VARCHAR(255) NOT NULL,
-    coverage_amount DOUBLE NOT NULL,
-    premium_amount DOUBLE NOT NULL
+CREATE TABLE Policy (
+policy_id INT AUTO_INCREMENT PRIMARY KEY,
+policy_number VARCHAR(255) UNIQUE NOT NULL,
+type VARCHAR(255) NOT NULL,
+coverage_amount DOUBLE NOT NULL,
+premium_amount DOUBLE NOT NULL
 );
 ```
 
 ```shell
-	CREATE TABLE Customer (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    phone_number VARCHAR(255) NOT NULL,
-    address VARCHAR(255) NOT NULL
+CREATE TABLE Customer (
+customer_id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+email VARCHAR(255) NOT NULL,
+phone_number VARCHAR(255) NOT NULL,
+address VARCHAR(255) NOT NULL
 );
 ```
 
 ```shell
-	CREATE TABLE Claim (
-    claim_id INT AUTO_INCREMENT PRIMARY KEY,
-    policy_id INT,
-    customer_id INT,
-    claim_date DATE NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT "Submitted",
-    FOREIGN KEY (policy_id) REFERENCES Policy(policy_id),
-    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
+CREATE TABLE Claim (
+claim_id INT AUTO_INCREMENT PRIMARY KEY,
+policy_id INT,
+customer_id INT,
+claim_date DATE NOT NULL,
+status VARCHAR(50) NOT NULL DEFAULT "Submitted",
+FOREIGN KEY (policy_id) REFERENCES Policy(policy_id),
+FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
 );
 ```
 
